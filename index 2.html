@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MAMCE Campus</title>
+<style>
+:root{--bg:#f3f5f8;--cd:#fff;--tx:#15202e;--mu:#5b6676;--bd:#dfe4eb;--ac:#14213d;--ac2:#b8860b;--acl:#e9edf5;--er:#b42318;--ok:#177245;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e131b;--cd:#171d28;--tx:#e8ecf2;--mu:#98a2b3;--bd:#283040;--ac:#9db4ec;--ac2:#e0b84a;--acl:#1d2740;--er:#ff8b7e;--ok:#5ad39a}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:600;margin:0 0 8px}h1{font-size:24px}h2{font-size:20px}h3{font-size:16px;margin:18px 0 8px}
+.mu{color:var(--mu)}.err{color:var(--er);min-height:1.2em;margin:6px 0}a{color:var(--ac)}
+.shell{min-height:100vh}.main{padding:16px 16px 88px;max-width:1080px;margin:0 auto;width:100%}
+.side{display:none}
+.bnav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:4px;overflow-x:auto;background:var(--cd);border-top:1px solid var(--bd);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.nv{font:inherit;border:0;background:none;color:var(--mu);padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.nv.on{background:var(--acl);color:var(--ac);font-weight:600}
+@media(min-width:900px){.shell{display:grid;grid-template-columns:240px 1fr}.side{display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow:auto;padding:20px 12px;background:var(--cd);border-right:1px solid var(--bd)}.side .nv{text-align:left;width:100%}.bnav{display:none}.main{padding:32px}}
+.brand{font:600 18px Georgia,serif;padding:0 10px 4px;color:var(--ac)}.who{padding:0 10px 14px;font-size:13px}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:16px;overflow-wrap:anywhere}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>input{flex:1;min-width:0}
+.btn{font:inherit;font-weight:600;background:var(--ac);color:var(--cd);border:1px solid var(--ac);border-radius:8px;padding:10px 16px;cursor:pointer;min-height:44px}
+.btn.ghost{background:none;color:var(--ac)}.btn.danger{background:var(--er);border-color:var(--er);color:#fff}.btn.sm{padding:6px 12px;min-height:36px;font-size:14px}
+.btn:focus-visible,.nv:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+label{display:block;margin:0 0 12px;font-size:14px;color:var(--mu)}
+input,select,textarea{display:block;width:100%;font:inherit;color:var(--tx);background:var(--cd);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-top:4px;min-height:44px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}.chip{font:inherit;border:1px solid var(--bd);background:var(--cd);color:var(--tx);border-radius:20px;padding:6px 14px;cursor:pointer;white-space:nowrap}.chip.on{background:var(--ac);color:var(--cd);border-color:var(--ac)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:10px;background:var(--acl);color:var(--ac);margin-left:6px}.tag.bad{background:var(--er);color:#fff}
+.hero{border-left:4px solid var(--ac2);margin-bottom:16px}
+.auth{max-width:420px;margin:0 auto;padding:40px 16px}.crest{font:600 26px Georgia,serif;color:var(--ac);cursor:default;user-select:none;margin-bottom:4px}
+.auth .btn{width:100%;margin-top:8px}.auth .row .btn{width:auto;margin:0}
+.chat{display:grid;gap:12px}.cl .btn{width:100%;text-align:left;margin-top:6px}
+.msgs{max-height:48vh;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.m{max-width:85%;padding:8px 12px;border-radius:12px;background:var(--acl);align-self:flex-start;overflow-wrap:anywhere}.m.me{align-self:flex-end;background:var(--ac);color:var(--cd)}.m small{display:block;opacity:.7;font-size:11px}
+.m .btn{margin-top:4px;color:inherit;border-color:currentColor}
+@media(max-width:799px){.chat.open .cl{display:none}.chat:not(.open) .th{display:none}}
+@media(min-width:800px){.chat{grid-template-columns:260px 1fr}.back{display:none}}
+dialog{border:1px solid var(--bd);border-radius:12px;background:var(--cd);color:var(--tx);width:min(480px,calc(100vw - 24px));max-height:90vh;overflow:auto;padding:20px}dialog::backdrop{background:rgba(0,0,0,.45)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;background:var(--ac);color:var(--cd);padding:10px 16px;border-radius:8px;display:none;max-width:90vw;z-index:9}
+.bub{margin:8px 0;padding:10px 14px;border-radius:12px;background:var(--acl)}.bub.q{background:var(--ac);color:var(--cd);margin-left:auto;width:fit-content;max-width:90%}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body><div id="app"></div><dialog id="dlg"></dialog><div id="toast" role="status"></div>
+<script>
+/* NOTE: Everything between "SIMULATED BACKEND" and "UI" stands in for a real server.
+   In production these functions become authenticated API endpoints; the client is never trusted. */
+const COLLEGE={name:'M. A. M. College Of Engineering',addr:'Trichy - Chennai Trunk Road, Siruganur, Tiruchirapalli - 621 105, Tamil Nadu, India'};
+const DEPTS=['CSE','ECE','EEE','Mechanical','Civil','AI & DS'],DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const ROLE={student:'Student',other:'Other college student',staff:'Staff',principal:'Principal'};
+const AUD=['All students','Staff',...DEPTS.map(d=>d+' dept')];
+const $=(s,e=document)=>e.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const bad=m=>{throw Error(m)},need=ok=>{if(!ok)bad('You do not have permission for this action.')};
+const uid=()=>Math.random().toString(36).slice(2,10),today=()=>new Date().toISOString().slice(0,10);
+const COL={
+timetable:{label:'Timetable',one:'timetable entry',f:[['dept','Department','sel',DEPTS],['year','Year','sel',[1,2,3,4]],['section','Section','text'],['day','Day','sel',DAYS],['period','Period','sel',[1,2,3,4,5,6,7,8]],['start','Start time','time'],['end','End time','time'],['subject','Subject','text'],['staff','Staff in-charge','staff'],['room','Room','text',,1]]},
+events:{label:'Events',one:'event',pub:1,f:[['title','Title','text'],['date','Date','date'],['time','Time','time'],['location','Location','text'],['desc','Description','area',,1],['staff','Responsible staff','staff'],['contact','Contact number (10 digits)','tel',,1],['maps','Google Maps link or place (optional)','text',,1],['published','Published','sel',['yes','no']]]},
+notices:{label:'Notices',one:'notice',pub:1,f:[['title','Title','text'],['body','Content','area'],['date','Date','date'],['audience','Audience','sel',AUD],['published','Published','sel',['yes','no']]]},
+calendar:{label:'Academic calendar',one:'calendar item',f:[['title','Title','text'],['date','Date','date'],['type','Type','sel',['Exam','Holiday','Event','Deadline']]]}};
+const RC={tt:'timetable',ev:'events',nt:'notices',cal:'calendar'};
+
+/* ===== SIMULATED BACKEND ===== */
+function seed(){const d=today();return{users:[
+{id:'u1',role:'student',name:'Asha Kumar',roll:'21CS001',dob:'2003-05-14',dept:'CSE',yj:2024,hostel:'Day scholar',mobile:'9000000001',pm:'9000000011',active:true},
+{id:'u2',role:'staff',name:'Dr. Ravi',staffId:'T100',dept:'CSE',mobile:'9000000002',active:true},
+{id:'u3',role:'staff',name:'Ms. Priya',staffId:'T200',dept:'ECE',mobile:'9000000004',active:true},
+{id:'u4',role:'principal',name:'Principal',mobile:'9000000003',code:'246810',active:true}],
+timetable:[{id:uid(),dept:'CSE',year:3,section:'A',day:DAYS[(new Date().getDay()+6)%7]||'Monday',period:1,start:'09:00',end:'09:50',subject:'Data Structures',staff:'Dr. Ravi',room:'B-204'}],
+events:[{id:uid(),title:'Tech Symposium',date:d,time:'10:00',location:'Main Auditorium',desc:'Paper presentations and workshops open to other colleges.',staff:'Dr. Ravi',contact:'9000000002',maps:'',published:'yes'}],
+notices:[{id:uid(),title:'Welcome back',body:'Classes follow the published timetable.',date:d,audience:'All students',published:'yes'}],
+calendar:[{id:uid(),title:'Internal Assessment 1',date:d,type:'Exam'}],feedback:[],messages:[],restrictions:[],audit:[],settings:{sp:true}}}
+let DB;try{DB=JSON.parse(localStorage.getItem('mamce_cms'))}catch(e){}DB=DB||seed();
+const persist=()=>{try{localStorage.setItem('mamce_cms',JSON.stringify(DB))}catch(e){}};
+let S=null;
+const yearOf=u=>Math.min(4,Math.max(1,new Date().getFullYear()-u.yj+(new Date().getMonth()>=5?1:0)));
+const restr=u=>DB.restrictions.filter(r=>r.sid===u.id&&r.until>Date.now()).sort((a,b)=>b.until-a.until)[0];
+const audit=a=>{DB.audit.unshift({t:Date.now(),by:S.name,a});DB.audit=DB.audit.slice(0,100)};
+const otps={},reqs={};
+function sendOtp(m){if(!/^\d{10}$/.test(m))bad('Enter a valid 10-digit mobile number.');const t=Date.now();reqs[m]=(reqs[m]||[]).filter(x=>t-x<6e5);if(reqs[m].length>=3)bad('Too many OTP requests. Try again in 10 minutes.');reqs[m].push(t);const c=''+(100000+Math.floor(Math.random()*9e5));otps[m]={c,exp:t+3e5,n:0};toast('Demo OTP: '+c+' (a real build sends this by SMS)',9000)}
+function checkOtp(m,c){const o=otps[m];if(!o)bad('Request an OTP first.');if(Date.now()>o.exp)bad('OTP expired. Request a new one.');if(++o.n>5){delete otps[m];bad('Too many attempts. Request a new OTP.')}if(o.c!==c)bad('Invalid OTP.');delete otps[m]}
+const AUTH={
+student(v){return DB.users.find(x=>x.role==='student'&&x.roll===v.roll.trim().toUpperCase()&&x.mobile===v.mobile)||bad('No student found with these details. Register first.')},
+sreg(v){const roll=v.roll.trim().toUpperCase();if(DB.users.some(x=>x.role==='student'&&x.roll===roll))bad('This roll number is already registered. Sign in instead.');if(!/^\d{10}$/.test(v.pm))bad('Enter a valid parent mobile number.');const yj=+v.yj;if(!(yj>=2015&&yj<=2035))bad('Enter a valid year joined.');
+const u={id:uid(),role:'student',name:v.name.trim(),roll,dob:v.dob,dept:v.dept,yj,ye:yj+4,hostel:v.hostel,mobile:v.mobile,pm:v.pm,active:true};DB.users.push(u);persist();toast('Registered. Expected year ending: '+u.ye);return u},
+other(v){const roll=v.roll.trim().toUpperCase(),col=v.college.trim();let u=DB.users.find(x=>x.role==='other'&&x.roll===roll&&x.mobile===v.mobile&&x.college===col);if(!u){u={id:uid(),role:'other',name:col+' ('+roll+')',college:col,roll,mobile:v.mobile,active:true};DB.users.push(u);persist()}return u},
+staff(v){return DB.users.find(x=>x.role==='staff'&&x.name.toLowerCase()===v.name.trim().toLowerCase()&&x.staffId===v.sid.trim().toUpperCase()&&x.dept===v.dept&&x.mobile===v.mobile)||bad('Verification failed. Check your details.')},
+principal(v){return DB.users.find(x=>x.role==='principal'&&x.mobile===v.mobile&&x.code===v.code.trim())||bad('Verification failed. Check your details.')}};
+function list(c){need(S);let a=DB[c].slice();const r=S.role;
+if(COL[c].pub&&r!=='principal')a=a.filter(x=>x.published==='yes');
+if(c==='timetable'){need(r!=='other');if(r==='staff')a=a.filter(x=>x.dept===S.dept);if(r==='student')a=a.filter(x=>x.dept===S.dept&&+x.year===yearOf(S))}
+if(c==='notices'){need(r!=='other');if(r==='student')a=a.filter(x=>x.audience==='All students'||x.audience===S.dept+' dept');else if(r==='staff')a=a.filter(x=>x.audience==='Staff'||x.audience===S.dept+' dept')}
+if(c==='calendar')need(r!=='other');return a}
+function saveItem(c,id,v){need(S&&S.role==='principal');const D=COL[c],it={};
+for(const[k,l,t,o,opt]of D.f){let x=String(v[k]??'').trim();if(!x&&!opt)bad(l+' is required.');if(t==='sel'&&o&&!o.map(String).includes(x))bad('Choose a valid '+l.toLowerCase()+'.');if(t==='staff'&&!DB.users.some(u=>u.role==='staff'&&u.name===x))bad('Choose a valid staff member.');if(k==='contact'&&x&&!/^\d{10}$/.test(x))bad('Contact number must be 10 digits.');it[k]=x.slice(0,1000)}
+if(c==='timetable'){if(it.end<=it.start)bad('End time must be after start time.');if(DB.timetable.some(x=>x.id!==id&&x.dept===it.dept&&x.year==it.year&&x.section.toLowerCase()===it.section.toLowerCase()&&x.day===it.day&&x.period==it.period))bad('That class already has an entry for this day and period.')}
+if(id){const i=DB[c].findIndex(x=>x.id===id);need(i>-1);DB[c][i]={...it,id}}else DB[c].push({...it,id:uid()});audit((id?'Updated ':'Created ')+D.one);persist()}
+function delItem(c,id){need(S&&S.role==='principal');DB[c]=DB[c].filter(x=>x.id!==id);audit('Deleted '+COL[c].one);persist()}
+function students(){need(S&&['staff','principal'].includes(S.role));return DB.users.filter(u=>u.role==='student'&&(S.role==='principal'||u.dept===S.dept)).map(u=>({id:u.id,name:u.name,roll:u.roll,dept:u.dept,year:yearOf(u),r:restr(u)}))}
+function restrict(sid,reason){need(S&&['staff','principal'].includes(S.role));const s=DB.users.find(u=>u.id===sid&&u.role==='student');need(s&&(S.role==='principal'||s.dept===S.dept));if(reason.trim().length<3)bad('Enter a reason.');DB.restrictions.push({id:uid(),sid,by:S.name,reason:reason.trim().slice(0,300),until:Date.now()+17*36e5});audit('Restricted '+s.roll+' for 17 hours');persist()}
+function lift(sid){need(S&&S.role==='principal');DB.restrictions.forEach(r=>{if(r.sid===sid&&r.until>Date.now())r.until=Date.now()});audit('Lifted a restriction');persist()}
+const canChat=(a,b)=>a.id!==b.id&&b.active!==false&&(a.role==='student'&&b.role==='staff'||a.role==='staff'&&b.role==='student'&&a.dept===b.dept||a.role==='staff'&&b.role==='principal'||a.role==='principal'&&b.role==='staff'||DB.settings.sp&&(a.role==='student'&&b.role==='principal'||a.role==='principal'&&b.role==='student'));
+const cid=(a,b)=>[a,b].sort().join('|');
+function contacts(q){need(S);q=(q||'').toLowerCase();return DB.users.filter(u=>canChat(S,u)&&(!q||u.name.toLowerCase().includes(q))).slice(0,30)}
+function thread(pid){const p=DB.users.find(u=>u.id===pid);need(S&&p&&canChat(S,p));return DB.messages.filter(m=>m.cid===cid(S.id,pid)).slice(-100)}
+function send(pid,text){const p=DB.users.find(u=>u.id===pid);need(S&&p&&canChat(S,p));if(S.role==='student'&&restr(S))bad('Your account is restricted, so you cannot send messages.');text=text.trim();if(!text)bad('Type a message first.');DB.messages.push({id:uid(),cid:cid(S.id,pid),from:S.id,text:text.slice(0,2000),t:Date.now()});persist()}
+function editMsg(id,text){const m=DB.messages.find(x=>x.id===id);need(m&&m.from===S.id);if(Date.now()-m.t>6e4)bad('Messages can only be edited within 1 minute of sending.');text=text.trim();if(!text)bad('Message cannot be empty.');m.text=text.slice(0,2000);m.edited=1;persist()}
+function addFb(text){need(S&&S.role==='student');if(restr(S))bad('Your account is restricted, so you cannot send feedback.');text=text.trim();if(text.length<5)bad('Write at least 5 characters.');DB.feedback.unshift({id:uid(),sid:S.id,text:text.slice(0,1000),t:Date.now(),st:'New',reply:''});persist()}
+function fbList(){need(S&&['student','principal'].includes(S.role));return DB.feedback.filter(f=>S.role==='principal'||f.sid===S.id).map(f=>({...f,who:S.role==='principal'?(DB.users.find(u=>u.id===f.sid)||{}).name:''}))}
+function fbMark(id,reply){need(S&&S.role==='principal');const f=DB.feedback.find(x=>x.id===id);need(f);if(reply!==undefined){if(!reply.trim())bad('Write a response first.');f.reply=reply.trim().slice(0,1000);f.st='Responded'}else if(f.st==='New')f.st='Read';persist()}
+
+/* ===== UI ===== */
+const NAV={student:[['home','Home'],['tt','Timetable'],['ev','Events'],['nt','Notices'],['cal','Calendar'],['map','Map'],['fb','Feedback'],['chat','Chat'],['ai','Assistant']],
+other:[['ev','Events'],['map','Map'],['ai','Assistant']],
+staff:[['home','Home'],['tt','Timetable'],['stu','Students'],['ev','Events'],['nt','Notices'],['cal','Calendar'],['chat','Chat'],['ai','Assistant']],
+principal:[['home','Home'],['tt','Timetable'],['ev','Events'],['nt','Notices'],['cal','Calendar'],['stu','Students'],['stf','Staff'],['fb','Feedback'],['chat','Chat'],['map','Map'],['ai','Assistant'],['adm','Admin']]};
+let route='',ui={auth:location.hash==='#staff'?'hid':'home'},tt0=0,crest=[];
+const toast=(m,ms=3500)=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',ms)};
+const run=f=>{try{f()}catch(e){toast(e.message)}};
+const dlg=h=>{$('#dlg').innerHTML=h;if(!$('#dlg').open)$('#dlg').showModal()};
+const empty=m=>`<div class="card mu">${m}</div>`,head=(t,btn)=>`<div class=hd><h1>${t}</h1>${btn||''}</div>`;
+const fld=(n,l,t='text',x='')=>`<label>${l}<input name=${n} type=${t} ${x||'required'} autocomplete=off></label>`;
+const sel=(n,l,o)=>`<label>${l}<select name=${n}>${o.map(v=>`<option>${esc(v)}</option>`).join('')}</select></label>`;
+const MOB='inputmode=numeric maxlength=10 pattern="[0-9]{10}" required';
+const OTPF='<label>OTP<span class=row><input name=otp inputmode=numeric maxlength=6 placeholder="6 digits" required><button type=button class="btn ghost" data-a=otp>Send OTP</button></span></label>';
+function authHTML(){const m=ui.auth;const P={
+student:['Student sign in',fld('roll','Roll number')+fld('mobile','Registered mobile','tel',MOB)+OTPF,'<p class=mu>First time here? <a href=# data-a=am data-i=sreg>Register</a></p>'],
+sreg:['Student registration',fld('name','Full name')+fld('roll','Roll number')+fld('dob','Date of birth','date')+sel('dept','Department',DEPTS)+fld('yj','Year joined','number','min=2015 max=2035 required')+sel('hostel','Residence',['Day scholar','Hosteller'])+fld('mobile','Your mobile','tel',MOB)+fld('pm','Parent mobile','tel',MOB)+OTPF,'<p class=mu>Expected year ending is calculated as year joined plus 4.</p>'],
+other:['Other college student',fld('college','College name')+fld('roll','Roll number')+fld('mobile','Mobile','tel',MOB)+OTPF,''],
+staff:['Staff sign in',fld('name','Staff name')+fld('sid','Staff ID')+sel('dept','Department',DEPTS)+fld('mobile','Registered mobile','tel',MOB)+OTPF,''],
+principal:['Principal sign in',fld('mobile','Registered mobile','tel',MOB)+fld('code','Verification code','password')+OTPF,'']}[m];
+const back=m==='home'?'':`<button class="btn ghost sm" style="width:auto" data-a=am data-i=${m==='sreg'?'student':'home'}>Back</button>`;
+let body;if(m==='home')body=`<h2>Sign in</h2><button class=btn data-a=am data-i=student>Student login</button><button class="btn ghost" data-a=am data-i=other>Other college student login</button>`;
+else if(m==='hid')body=`<h2>Staff access</h2><button class=btn data-a=am data-i=staff>Staff sign in</button><button class="btn ghost" data-a=am data-i=principal>Principal sign in</button>`;
+else body=`<h2>${P[0]}</h2><form data-f=auth>${P[1]}<p class=err></p><button class=btn>Verify and sign in</button></form>${P[2]}`;
+return `<div class=auth><div class=crest data-a=crest>MAMCE Campus</div><p class=mu>${COLLEGE.name}</p><div class=card>${back}${body}</div></div>`}
+function rstBanner(){const r=S.role==='student'&&restr(S);return r?`<div class="card err" style="margin-bottom:12px">Your account is restricted until ${new Date(r.until).toLocaleString()}. Reason: ${esc(r.reason)}. Chat and feedback are paused until then.</div>`:''}
+function render(){const a=$('#app');if(!S){a.innerHTML=authHTML();return}
+if(!NAV[S.role].some(n=>n[0]===route))route=NAV[S.role][0][0];
+const nav=NAV[S.role].map(([k,l])=>`<button class="nv${k===route?' on':''}" data-a=go data-i=${k}>${l}</button>`).join('')+'<button class=nv data-a=out>Sign out</button>';
+let b;try{b=VIEWS[route]()}catch(e){b=`<div class="card err">${esc(e.message)}</div>`}
+a.innerHTML=`<div class=shell><aside class=side><div class=brand>MAMCE Campus</div><div class=who>${esc(S.name)}<br><span class=mu>${ROLE[S.role]}${S.dept?' · '+esc(S.dept):''}</span></div>${nav}</aside><main class=main>${rstBanner()}${b}</main><nav class=bnav>${nav}</nav></div>`;
+const m=$('#msgs');if(m)m.scrollTop=m.scrollHeight}
+const mapLink=x=>x.maps&&/^https?:\/\//.test(x.maps)?x.maps:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(x.maps||x.location+', '+COLLEGE.name+', Tiruchirapalli');
+function item(c,x){const p=S.role==='principal';let t,m;
+if(c==='timetable'){t=`Period ${x.period}: ${esc(x.subject)}`;m=`${x.start}–${x.end} · Year ${x.year} ${esc(x.section)}<br>${esc(x.staff)}${x.room?' · '+esc(x.room):''}`}
+if(c==='events'){t=esc(x.title);m=`${x.date} at ${x.time}<br>${esc(x.location)}<br>${esc(x.desc)}<br>${x.staff?'In charge: '+esc(x.staff):''}${x.contact?' · '+esc(x.contact):''}<br><a href="${esc(mapLink(x))}" target=_blank rel=noopener>Open in Google Maps</a>`}
+if(c==='notices'){t=esc(x.title);m=`${esc(x.body)}<br><span class=mu>${x.date} · ${esc(x.audience)}</span>`}
+if(c==='calendar'){t=esc(x.title);m=`${x.date} · ${esc(x.type)}`}
+const act=p?`<div class=row style="margin-top:10px"><button class="btn ghost sm" data-a=edit data-c=${c} data-i=${x.id}>Edit</button><button class="btn ghost sm" data-a=del data-c=${c} data-i=${x.id}>Delete</button></div>`:'';
+return `<div class=card><h3 style="margin-top:0">${t}${p&&x.published==='no'?'<span class=tag>Draft</span>':''}</h3><div class=mu>${m}</div>${act}</div>`}
+function crud(c){const p=S.role==='principal',D=COL[c];let a=list(c).sort((m,n)=>(m.date||'').localeCompare(n.date||''));
+return head(D.label,p?`<button class=btn data-a=add data-c=${c}>Add ${D.one}</button>`:'')+(a.length?`<div class=grid>${a.map(x=>item(c,x)).join('')}</div>`:empty(p?'Nothing here yet. Add the first one.':'Nothing has been published yet.'))}
+function openForm(c,id){const D=COL[c],x=id?DB[c].find(y=>y.id===id):{};
+const fs=D.f.map(([k,l,t,o])=>{const v=x[k]??(k==='dept'&&c==='timetable'?ui.dept||DEPTS[0]:'');
+if(t==='sel'||t==='staff'){const op=t==='staff'?DB.users.filter(u=>u.role==='staff').map(u=>u.name):o;return `<label>${l}<select name=${k}>${op.map(q=>`<option${String(q)===String(v)?' selected':''}>${esc(q)}</option>`).join('')}</select></label>`}
+if(t==='area')return `<label>${l}<textarea name=${k} rows=3>${esc(v)}</textarea></label>`;
+return `<label>${l}<input name=${k} type=${t} value="${esc(v)}"></label>`}).join('');
+dlg(`<h2>${id?'Edit':'Add'} ${D.one}</h2><form data-f=crud data-c=${c} data-id="${id||''}">${fs}<p class=err></p><div class=row><button class=btn>Save</button><button type=button class="btn ghost" data-a=close>Cancel</button></div></form>`)}
+const stuRes=()=>{const q=(ui.q||'').toLowerCase();const a=students().filter(s=>(!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q))&&(!ui.fd||s.dept===ui.fd)&&(!ui.fy||s.year==ui.fy)&&(!ui.fs||(ui.fs==='Restricted')===!!s.r));const p=a.slice(0,(ui.pg||1)*12);
+return a.length?`<div class=grid>${p.map(s=>`<div class=card><h3 style="margin-top:0">${esc(s.name)}${s.r?'<span class="tag bad">Restricted</span>':''}</h3><div class=mu>${esc(s.roll)} · ${esc(s.dept)} · Year ${s.year}</div><div class=row style="margin-top:10px">${s.r?(S.role==='principal'?`<button class="btn ghost sm" data-a=lift data-i=${s.id}>Lift restriction</button>`:`<span class=mu>Until ${new Date(s.r.until).toLocaleTimeString()}</span>`):`<button class="btn ghost sm" data-a=rst data-i=${s.id}>Restrict for 17 hours</button>`}</div></div>`).join('')}</div>${a.length>p.length?'<p><button class="btn ghost" data-a=more>Load more</button></p>':''}`:empty('No students match your filters.')}
+const contactsHTML=()=>{const c=contacts(ui.cq);return c.length?c.map(u=>`<button class="btn ghost${ui.peer===u.id?' sm':''}" data-a=peer data-i=${u.id}>${esc(u.name)} <span class=mu>${ROLE[u.role]}</span></button>`).join(''):'<p class=mu>No one available to chat with.</p>'};
+function threadHTML(){const p=DB.users.find(u=>u.id===ui.peer),ms=thread(ui.peer);
+return `<button class="btn ghost sm back" data-a=nopeer>Back</button><h3 style="margin-top:0">${esc(p.name)}</h3><div class=msgs id=msgs>${ms.length?ms.map(m=>{const me=m.from===S.id;return `<div class="m${me?' me':''}">${esc(m.text)}<small>${new Date(m.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}${m.edited?' · edited':''}</small>${me&&Date.now()-m.t<6e4?`<button class="btn sm ghost" data-a=emsg data-i=${m.id}>Edit</button>`:''}</div>`}).join(''):'<p class=mu>No messages yet. Say hello.</p>'}</div><form data-f=send class=row><input name=text placeholder="Write a message" maxlength=2000 autocomplete=off><button class=btn>Send</button></form>`}
+const VIEWS={
+home(){const n=NAV[S.role].filter(x=>x[0]!=='home');let a=[];try{a=list('timetable').filter(x=>x.day===DAYS[(new Date().getDay()+6)%7]).sort((m,n)=>m.period-n.period)}catch(e){}
+const hero=S.role!=='principal'?`<div class="card hero"><h3 style="margin-top:0">Today</h3>${a.length?a.map(x=>`<div>Period ${x.period} · ${esc(x.subject)} · ${x.start}–${x.end}</div>`).join(''):'<span class=mu>No periods scheduled today.</span>'}</div>`:`<div class="card hero"><h3 style="margin-top:0">College overview</h3><div class=mu>${DB.users.filter(u=>u.role==='student').length} students · ${DB.users.filter(u=>u.role==='staff').length} staff · ${DB.events.filter(e=>e.published==='yes').length} published events · ${DB.feedback.filter(f=>f.st==='New').length} new feedback</div></div>`;
+return head('Welcome, '+esc(S.name.split(' ')[0]))+hero+`<div class=grid>${n.map(([k,l])=>`<button class="card nv" style="text-align:left;font-size:16px" data-a=go data-i=${k}>${l}</button>`).join('')}</div>`},
+tt(){const p=S.role==='principal',d=ui.dept||DEPTS[0];let a=list('timetable');if(p)a=a.filter(x=>x.dept===d);
+const tabs=p?`<div class=chips>${DEPTS.map(x=>`<button class="chip${x===d?' on':''}" data-a=tab data-i="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:'';
+const g=DAYS.map(y=>[y,a.filter(x=>x.day===y).sort((m,n)=>m.period-n.period)]).filter(z=>z[1].length);
+return head(p?'Timetable: '+esc(d):'Timetable',p?'<button class=btn data-a=add data-c=timetable>Add entry</button>':'')+tabs+(g.length?g.map(([y,z])=>`<h3>${y}</h3><div class=grid>${z.map(x=>item('timetable',x)).join('')}</div>`).join(''):empty(p?'No entries for this department yet.':'No timetable has been published for you yet.'))},
+ev:()=>crud('events'),nt:()=>crud('notices'),cal:()=>crud('calendar'),
+stu(){need(['staff','principal'].includes(S.role));const p=S.role==='principal';return head('Students')+`<div class=row style="margin-bottom:12px"><input placeholder="Search name or roll number" data-a=q data-k=q value="${esc(ui.q||'')}">${p?`<select data-a=q data-k=fd style="width:auto"><option value="">All departments</option>${DEPTS.map(d=>`<option${ui.fd===d?' selected':''}>${esc(d)}</option>`).join('')}</select>`:''}<select data-a=q data-k=fy style="width:auto"><option value="">All years</option>${[1,2,3,4].map(y=>`<option${ui.fy==y?' selected':''}>${y}</option>`).join('')}</select><select data-a=q data-k=fs style="width:auto"><option value="">Any status</option><option${ui.fs==='Active'?' selected':''}>Active</option><option${ui.fs==='Restricted'?' selected':''}>Restricted</option></select></div><div id=res>${stuRes()}</div>`},
+stf(){need(S.role==='principal');const a=DB.users.filter(u=>u.role==='staff');return head('Staff')+`<div class=grid>${a.map(u=>`<div class=card><h3 style="margin-top:0">${esc(u.name)}</h3><div class=mu>${esc(u.staffId)} · ${esc(u.dept)}<br>${DB.timetable.filter(t=>t.staff===u.name).length} timetable periods · ${u.active!==false?'Active':'Disabled'}</div></div>`).join('')}</div>`},
+fb(){const a=fbList(),p=S.role==='principal';return head('Feedback')+(p?'':`<form data-f=fb class=card style="margin-bottom:12px"><label>Your feedback goes privately to the Principal<textarea name=text rows=3 maxlength=1000 required></textarea></label><p class=err></p><button class=btn>Send feedback</button></form>`)+(a.length?`<div class=grid>${a.map(f=>`<div class=card><div class=mu>${p?esc(f.who)+' · ':''}${new Date(f.t).toLocaleDateString()}<span class=tag>${f.st}</span></div><p>${esc(f.text)}</p>${f.reply?`<div class=bub>${esc(f.reply)}</div>`:''}${p?`<div class=row>${f.st==='New'?`<button class="btn ghost sm" data-a=fread data-i=${f.id}>Mark as read</button>`:''}<button class="btn ghost sm" data-a=frep data-i=${f.id}>Respond</button></div>`:''}</div>`).join('')}</div>`:empty(p?'No feedback received yet.':'You have not sent any feedback.'))},
+chat(){return head('Chat')+`<div class="chat${ui.peer?' open':''}"><div class="card cl"><input placeholder="Search people" data-a=q data-k=cq value="${esc(ui.cq||'')}"><div id=cl>${contactsHTML()}</div></div><div class="card th">${ui.peer?threadHTML():'<p class=mu>Choose a person to start a private chat.</p>'}</div></div>`},
+map(){const q=encodeURIComponent(COLLEGE.name+', '+COLLEGE.addr);return head('College map')+`<div class="card"><h3 style="margin-top:0">${COLLEGE.name}</h3><p class=mu>${COLLEGE.addr}</p><div class=row><a class=btn href="https://www.google.com/maps/search/?api=1&query=${q}" target=_blank rel=noopener>Open in Google Maps</a><a class="btn ghost" style="text-decoration:none" href="https://www.google.com/maps/dir/?api=1&destination=${q}" target=_blank rel=noopener>Get directions</a></div></div>`},
+ai(){return head('Assistant')+`<div class=card>${(ui.ai||[]).map(h=>`<div class="bub q">${esc(h[0])}</div><div class=bub>${h[1]}</div>`).join('')||'<p class=mu>Ask about the timetable, events, notices, the academic calendar, the college, or how to find something.</p>'}<form data-f=ai class=row style="margin-top:12px"><input name=q placeholder="Ask a question" maxlength=200 required autocomplete=off><button class=btn>Ask</button></form></div>`},
+adm(){need(S.role==='principal');const rs=DB.restrictions.filter(r=>r.until>Date.now());return head('Administrative controls')+`<div class=card style="margin-bottom:12px"><h3 style="margin-top:0">Student chat with the Principal</h3><p class=mu>Currently ${DB.settings.sp?'enabled':'disabled'}.</p><button class="btn ghost" data-a=sp>${DB.settings.sp?'Disable':'Enable'}</button></div><div class=card style="margin-bottom:12px"><h3 style="margin-top:0">Active restrictions</h3>${rs.length?rs.map(r=>`<div>${esc((DB.users.find(u=>u.id===r.sid)||{}).name)} until ${new Date(r.until).toLocaleString()} (by ${esc(r.by)})</div>`).join(''):'<span class=mu>None.</span>'}</div><div class=card><h3 style="margin-top:0">Audit log</h3>${DB.audit.slice(0,15).map(a=>`<div class=mu>${new Date(a.t).toLocaleString()} · ${esc(a.by)} · ${esc(a.a)}</div>`).join('')||'<span class=mu>No actions recorded yet.</span>'}</div>`}};
+function answer(q){q=q.toLowerCase();const L=c=>{try{return list(c)}catch(e){return null}},td=today();
+if(/timetable|class|period|schedule/.test(q)){const a=L('timetable');if(!a)return 'The timetable is not available for your account.';const d=a.filter(x=>x.day===DAYS[(new Date().getDay()+6)%7]).sort((m,n)=>m.period-n.period).slice(0,8);return d.length?'Today: '+d.map(x=>`P${x.period} ${esc(x.subject)} ${x.start}–${x.end}${S.role==='principal'?' ('+esc(x.dept)+')':''}`).join('; '):'No periods are scheduled today.'}
+if(/event|symposium|fest/.test(q)){const a=(L('events')||[]).filter(x=>x.date>=td).sort((m,n)=>m.date.localeCompare(n.date)).slice(0,3);return a.length?a.map(x=>`${esc(x.title)} on ${x.date} at ${x.time}, ${esc(x.location)}`).join('; '):'No upcoming events are published.'}
+if(/notice|announce/.test(q)){const a=L('notices');if(!a)return 'Notices are not available for your account.';return a.length?a.slice(-3).map(x=>esc(x.title)).join('; '):'There are no notices for you.'}
+if(/calendar|exam|holiday/.test(q)){const a=L('calendar');if(!a)return 'The academic calendar is not available for your account.';const u=a.filter(x=>x.date>=td).sort((m,n)=>m.date.localeCompare(n.date)).slice(0,3);return u.length?u.map(x=>`${esc(x.title)} on ${x.date}`).join('; '):'No upcoming calendar items.'}
+if(/map|where|college|location|address|direction/.test(q))return `${COLLEGE.name}, ${COLLEGE.addr}. Open the Map section for directions.`;
+return 'You can open: '+NAV[S.role].filter(x=>x[0]!=='home').map(x=>x[1]).join(', ')+'.'}
+const H={
+go(b){route=b.dataset.i;ui.peer=null;render()},out(){S=null;ui={auth:'home'};route='';render()},
+am(b){ui.auth=b.dataset.i;render()},
+crest(){crest.push(Date.now());crest=crest.filter(t=>Date.now()-t<3000);if(crest.length>=5){crest=[];ui.auth='hid';render()}},
+otp(b){sendOtp(b.closest('form').mobile.value.trim())},
+tab(b){ui.dept=b.dataset.i;render()},add(b){openForm(b.dataset.c)},edit(b){openForm(b.dataset.c,b.dataset.i)},close(){$('#dlg').close()},
+del(b){const c=b.dataset.c;dlg(`<h2>Delete this ${COL[c].one}?</h2><p class=mu>This cannot be undone.</p><div class=row><button class="btn danger" data-a=cdel data-c=${c} data-i=${b.dataset.i}>Delete</button><button class="btn ghost" data-a=close>Cancel</button></div>`)},
+cdel(b){delItem(b.dataset.c,b.dataset.i);$('#dlg').close();render();toast('Deleted')},
+more(){ui.pg=(ui.pg||1)+1;$('#res').innerHTML=stuRes()},
+rst(b){dlg(`<h2>Restrict student for 17 hours</h2><form data-f=rst data-i=${b.dataset.i}><label>Reason<textarea name=reason rows=3 maxlength=300 required></textarea></label><p class=err></p><div class=row><button class="btn danger">Restrict</button><button type=button class="btn ghost" data-a=close>Cancel</button></div></form>`)},
+lift(b){lift(b.dataset.i);render();toast('Restriction lifted')},
+fread(b){fbMark(b.dataset.i);render()},frep(b){dlg(`<h2>Respond to feedback</h2><form data-f=frep data-i=${b.dataset.i}><label>Response<textarea name=reply rows=3 maxlength=1000 required></textarea></label><p class=err></p><div class=row><button class=btn>Send response</button><button type=button class="btn ghost" data-a=close>Cancel</button></div></form>`)},
+peer(b){ui.peer=b.dataset.i;render()},nopeer(){ui.peer=null;render()},
+emsg(b){const m=DB.messages.find(x=>x.id===b.dataset.i);dlg(`<h2>Edit message</h2><form data-f=emsg data-i=${m.id}><label>Message<textarea name=text rows=3 maxlength=2000 required>${esc(m.text)}</textarea></label><p class=err></p><div class=row><button class=btn>Save</button><button type=button class="btn ghost" data-a=close>Cancel</button></div></form>`)},
+sp(){need(S.role==='principal');DB.settings.sp=!DB.settings.sp;audit('Changed student-to-principal chat setting');persist();render()}};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||!H[b.dataset.a])return;if(b.tagName==='A')e.preventDefault();run(()=>H[b.dataset.a](b))});
+let deb;document.addEventListener('input',e=>{const t=e.target;if(t.dataset.a!=='q')return;const k=t.dataset.k;clearTimeout(deb);deb=setTimeout(()=>{ui[k]=t.value;ui.pg=1;if(k==='cq')$('#cl').innerHTML=contactsHTML();else $('#res').innerHTML=stuRes()},250)});
+const FORMS={
+crud(v,f){saveItem(f.dataset.c,f.dataset.id||null,v);$('#dlg').close();render();toast('Saved')},
+rst(v,f){restrict(f.dataset.i,v.reason);$('#dlg').close();render();toast('Student restricted for 17 hours')},
+fb(v){addFb(v.text);render();toast('Feedback sent')},frep(v,f){fbMark(f.dataset.i,v.reply);$('#dlg').close();render();toast('Response sent')},
+send(v){send(ui.peer,v.text);render()},emsg(v,f){editMsg(f.dataset.i,v.text);$('#dlg').close();render()},
+ai(v){(ui.ai=ui.ai||[]).push([v.q,answer(v.q)]);render()}};
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,k=f.dataset.f;if(!k)return;const v=Object.fromEntries(new FormData(f));
+try{if(k==='auth'){checkOtp(v.mobile,(v.otp||'').trim());const u=AUTH[ui.auth](v);if(u.active===false)bad('This account is disabled. Contact the college office.');S=u;ui={};route='';render()}else FORMS[k](v,f)}
+catch(err){const el=$('.err',f);if(el)el.textContent=err.message;else toast(err.message)}});
+render();
+</script></body></html>
