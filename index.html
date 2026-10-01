@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M. A. M. College Of Engineering - Enterprise Portal</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg-base: #0F172A;
+      --bg-surface: #1E293B;
+      --bg-card: #334155;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --primary: #3B82F6;
+      --primary-hover: #2563EB;
+      --accent: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --border: #475569;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Header */
+    header { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    .brand { font-size: 1.15rem; font-weight: 700; color: #FFFFFF; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 0.5rem; }
+    .brand span { font-size: 0.75rem; background: var(--primary); padding: 2px 6px; border-radius: 4px; }
+    
+    /* Layout */
+    .app-container { display: flex; flex: 1; overflow: hidden; }
+    sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border); padding: 1.25rem 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    main { flex: 1; padding: 1.5rem; overflow-y: auto; background: var(--bg-base); }
+
+    /* Navigation */
+    .nav-btn { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--radius); border: none; background: transparent; color: var(--text-muted); font-size: 0.875rem; font-weight: 500; cursor: pointer; width: 100%; text-align: left; transition: all 0.2s; }
+    .nav-btn:hover, .nav-btn.active { background: var(--primary); color: #FFFFFF; }
+
+    /* Cards & Grids */
+    .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid #3B82F6; }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid #F59E0B; }
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; border: 1px solid #EF4444; }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid #10B981; }
+
+    /* Utilities */
+    .hidden { display: none !important; }
+    input, select, textarea { width: 100%; padding: 0.65rem; background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-main); font-size: 0.875rem; margin-top: 0.35rem; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    
+    button.btn { background: var(--primary); color: white; border: none; padding: 0.65rem 1.25rem; border-radius: var(--radius); font-weight: 600; cursor: pointer; transition: background 0.2s; font-size: 0.875rem; }
+    button.btn:hover { background: var(--primary-hover); }
+    button.btn-danger { background: var(--danger); }
+    button.btn-danger:hover { background: #DC2626; }
+    button.btn-sm { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+
+    /* Table Styles */
+    .table-container { overflow-x: auto; margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
+    th, td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+    th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 600; }
+
+    /* Tabs */
+    .dept-tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .tab-item { padding: 0.5rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--text-muted); }
+    .tab-item.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Messaging Module */
+    .chat-box { height: 350px; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.85rem; background: var(--bg-base); }
+    .msg { max-width: 75%; padding: 0.75rem 1rem; border-radius: var(--radius); font-size: 0.875rem; position: relative; }
+    .msg-sent { align-self: flex-end; background: #1E3A8A; color: #EFF6FF; border: 1px solid #3B82F6; }
+    .msg-recv { align-self: flex-start; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); }
+    .msg-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem; display: flex; justify-content: space-between; gap: 1rem; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+    .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 500px; padding: 1.5rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column; }
+      sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; overflow-x: auto; padding: 0.5rem; }
+      main { padding: 1rem; }
+      .nav-btn { white-space: nowrap; font-size: 0.8rem; padding: 0.5rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand" id="brandLogo" title="Triple-click for hidden Staff / Principal entry vector">
+      M. A. M. College Of Engineering <span>TNEA 3810</span>
+    </div>
+    <div id="userInfo" class="hidden" style="display:flex; align-items:center; gap:0.75rem;">
+      <span id="userRoleBadge" class="badge"></span>
+      <span id="userNameDisplay" style="font-size: 0.875rem; font-weight: 600;"></span>
+      <button id="logoutBtn" class="btn btn-sm btn-danger">Logout</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <sidebar id="sidebarNav" class="hidden">
+      <!-- Dynamic RBAC Navigation Buttons Injected Here -->
+    </sidebar>
+
+    <main id="mainContent">
+      <!-- Public Authentication View -->
+      <section id="publicLoginView" class="card" style="max-width: 440px; margin: 2rem auto;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Portal Login</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Select your access level to authenticate</p>
+
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <button id="tabBtnStudent" class="nav-btn active" style="justify-content: center; border: 1px solid var(--primary);" onclick="app.setAuthMode('STUDENT')">Student Login</button>
+          <button id="tabBtnExternal" class="nav-btn" style="justify-content: center; border: 1px solid var(--border);" onclick="app.setAuthMode('EXTERNAL')">Other College</button>
+        </div>
+
+        <form id="authForm">
+          <div id="formFields" style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <!-- Input Fields Injected Dynamically -->
+          </div>
+          <button type="submit" class="btn" style="width: 100%; margin-top: 1.25rem;">Authenticate &amp; Enter</button>
+        </form>
+      </section>
+
+      <!-- Operational Module View Host -->
+      <section id="operationalView" class="hidden">
+        <div id="restrictionBanner" class="card hidden" style="border-color: var(--danger); background: rgba(239, 68, 68, 0.1);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 style="color: var(--danger); font-size: 1rem;">⚠️ Account Temporarily Restricted</h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Administrative enforcement active. Communications and feedback modules are temporarily disabled.</p>
+            </div>
+            <span id="restrictionTimer" class="badge badge-red" style="font-size: 0.85rem;">17h 00m remaining</span>
+          </div>
+        </div>
+
+        <div id="viewHeader" style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 id="viewTitle" style="font-size: 1.4rem; font-weight: 700;">Dashboard</h2>
+            <p id="viewSubtitle" style="color: var(--text-muted); font-size: 0.85rem;">System scope context</p>
+          </div>
+          <div id="viewActions"></div>
+        </div>
+
+        <div id="viewBody">
+          <!-- Active Module Screen Rendered Dynamically -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Reusable Modal Window -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 id="modalTitle" style="margin-bottom: 1rem; font-size: 1.1rem;">Modal Action</h3>
+      <div id="modalBody"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
+        <button class="btn btn-sm" style="background:var(--border)" onclick="app.closeModal()">Cancel</button>
+        <button id="modalConfirmBtn" class="btn btn-sm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const app = (function() {
+      // System Data Store
+      let state = {
+        user: null,
+        mode: 'STUDENT',
+        logoClicks: 0,
+        clickTimer: null,
+        activeDept: 'CSE',
+        restrictedUntil: null,
+        messages: [
+          { id: 1, sender: 'Department Coordinator', text: 'Please note the revised schedule for mid-term assessments.', time: Date.now() - 150000, canEdit: false },
+          { id: 2, sender: 'You', text: 'Received. Will update the project repository.', time: Date.now() - 25000, canEdit: true }
+        ],
+        notices: [
+          { id: 101, title: 'Annual Symposium Registration Open', target: 'ALL', dept: 'ALL', date: '2026-10-05', content: 'Registrations are open for national technical paper presentations.' },
+          { id: 102, title: 'CSE Department Special Guest Lecture', target: 'CSE', dept: 'CSE', date: '2026-10-12', content: 'Guest lecture on Distributed Cloud Architectures at Seminar Hall 2.' }
+        ],
+        events: [
+          { id: 201, title: 'InnovateX 2026 Hackathon', date: '2026-10-20', time: '09:00 AM', venue: 'Main Auditorium', desc: 'Inter-college 24-hour product hackathon.' }
+        ],
+        timetables: {
+          'CSE': [
+            { day: 'Monday', p1: 'Data Structures (Prof. Arunkumar)', p2: 'Database Systems (Dr. Priya)', p3: 'Operating Systems (Dr. Sathish)', p4: 'Algorithms Lab' },
+            { day: 'Tuesday', p1: 'Discrete Math (Dr. Raman)', p2: 'AI & Data Science (Dr. Susan)', p3: 'Computer Networks (Prof. K. Raj)', p4: 'Seminar' }
+          ],
+          'ECE': [
+            { day: 'Monday', p1: 'VLSI Design (Dr. Meena)', p2: 'Signals & Systems (Prof. Anand)', p3: 'Embedded Systems', p4: 'DSP Lab' }
+          ],
+          'EEE': [
+            { day: 'Monday', p1: 'Power Electronics (Dr. Ramesh)', p2: 'Control Systems (Prof. Devi)', p3: 'Electrical Machines', p4: 'Circuit Theory' }
+          ],
+          'Mechanical': [
+            { day: 'Monday', p1: 'Thermodynamics (Dr. Kumar)', p2: 'CAD/CAM Lab', p3: 'Fluid Mechanics', p4: 'Kinematics' }
+          ],
+          'Civil': [
+            { day: 'Monday', p1: 'Structural Analysis (Dr. Ganesan)', p2: 'Surveying Lab', p3: 'Concrete Tech', p4: 'Geotech Engg' }
+          ],
+          'AI & DS': [
+            { day: 'Monday', p1: 'Machine Learning (Dr. Nithya)', p2: 'Python Analytics', p3: 'Deep Learning', p4: 'Cloud Computing' }
+          ]
+        },
+        feedbackList: [
+          { id: 301, student: 'Roll #812021104001', subject: 'Library Infrastructure', body: 'Requesting extended digital library access during exam weeks.', status: 'Unread' }
+        ],
+        students: [
+          { id: 'S1', roll: '812021104001', name: 'Aravind Swamy', dept: 'CSE', yearJoined: 2023, yearEnding: 2027, status: 'Active' },
+          { id: 'S2', roll: '812021104002', name: 'Bhavana Krishna', dept: 'ECE', yearJoined: 2024, yearEnding: 2028, status: 'Active' }
+        ]
+      };
+
+      const roleRoutes = {
+        STUDENT: ['Dashboard', 'Timetable', 'Events', 'Notices', 'Academic Calendar', 'College Map', 'Feedback', 'Private Chat', 'AI Assistant'],
+        EXTERNAL: ['Events Directory', 'College Map', 'AI Assistant'],
+        STAFF: ['Department Dashboard', 'Department Timetable', 'Student Directory', 'Events', 'Notices', 'Academic Calendar', 'Private Chat', 'AI Assistant'],
+        PRINCIPAL: ['Principal Dashboard', 'All Department Timetables', 'Events Management', 'Notices Management', 'Academic Calendar', 'Student Directory', 'Staff Directory', 'Feedback Review', 'Private Chat', 'College Map', 'AI Assistant']
+      };
+
+      const depts = ['CSE', 'ECE', 'EEE', 'Mechanical', 'Civil', 'AI & DS'];
+
+      function init() {
+        bindEvents();
+        setAuthMode('STUDENT');
+        setInterval(checkTimers, 1000);
+      }
+
+      function bindEvents() {
+        // Hidden Entry Vector (Triple click on brand header)
+        document.getElementById('brandLogo').addEventListener('click', () => {
+          state.logoClicks++;
+          clearTimeout(state.clickTimer);
+          if (state.logoClicks === 3) {
+            triggerAdministrativePrompt();
+            state.logoClicks = 0;
+          } else {
+            state.clickTimer = setTimeout(() => { state.logoClicks = 0; }, 1200);
+          }
+        });
+
+        document.getElementById('authForm').addEventListener('submit', handleAuthSubmit);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+      }
+
+      function triggerAdministrativePrompt() {
+        const pass = prompt("Enter Administrative Entry Access Code (STAFF / PRINCIPAL):");
+        if (pass) {
+          const upper = pass.trim().toUpperCase();
+          if (upper === 'STAFF' || upper === 'PRINCIPAL') {
+            setAuthMode(upper);
+          } else {
+            alert("Invalid administrative vector security token.");
+          }
+        }
+      }
+
+      function setAuthMode(mode) {
+        state.mode = mode;
+        const container = document.getElementById('formFields');
+        
+        document.getElementById('tabBtnStudent').className = `nav-btn ${mode === 'STUDENT' ? 'active' : ''}`;
+        document.getElementById('tabBtnExternal').className = `nav-btn ${mode === 'EXTERNAL' ? 'active' : ''}`;
+
+        if (mode === 'STUDENT') {
+          container.innerHTML = `
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">ROLL NUMBER</label><input type="text" id="inputRoll" required placeholder="e.g. 812021104001"></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">REGISTERED MOBILE NUMBER</label><input type="tel" id="inputMobile" required placeholder="10-digit mobile number"></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">VERIFICATION OTP</label><input type="text" required placeholder="Enter OTP (Simulated: 1234)"></div>
+          `;
+        } else if (mode === 'EXTERNAL') {
+          container.innerHTML = `
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">HOME INSTITUTION NAME</label><input type="text" required placeholder="Full college name"></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">ROLL / REGISTER NUMBER</label><input type="text" required placeholder="Native Roll Number"></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">MOBILE NUMBER</label><input type="tel" required placeholder="10-digit mobile number"></div>
+          `;
+        } else if (mode === 'STAFF') {
+          container.innerHTML = `
+            <div style="background: rgba(245, 158, 11, 0.15); padding: 0.5rem; border-radius: 4px; font-size: 0.75rem; color: #FBBF24; font-weight: 600;">Staff Authentication Vector Active</div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">STAFF ID</label><input type="text" required placeholder="e.g. STF-CSE-102"></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">DEPARTMENT</label><select id="staffDeptSelect">${depts.map(d=>`<option value="${d}">${d}</option>`).join('')}</select></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">REGISTERED MOBILE OTP</label><input type="password" required placeholder="••••••"></div>
+          `;
+        } else if (mode === 'PRINCIPAL') {
+          container.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.15); padding: 0.5rem; border-radius: 4px; font-size: 0.75rem; color: #FCA5A5; font-weight: 600;">Executive Principal Access Vector Active</div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">EXECUTIVE MOBILE NUMBER</label><input type="tel" required placeholder="Primary mobile"></div>
+            <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">SECONDARY MFA SECURITY PIN</label><input type="password" required placeholder="••••••••"></div>
+          `;
+        }
+      }
+
+      function handleAuthSubmit(e) {
+        e.preventDefault();
+        
+        let userName = 'Authenticated User';
+        let dept = 'CSE';
+
+        if (state.mode === 'PRINCIPAL') userName = 'Dr. Executive Principal';
+        else if (state.mode === 'STAFF') {
+          userName = 'Prof. Department Head';
+          dept = document.getElementById('staffDeptSelect')?.value || 'CSE';
+        } else if (state.mode === 'STUDENT') {
+          const roll = document.getElementById('inputRoll')?.value || '812021104001';
+          userName = `Student (${roll})`;
+        } else {
+          userName = 'External Student Guest';
+        }
+
+        state.user = { name: userName, role: state.mode, dept: dept };
+        state.activeDept = dept;
+
+        document.getElementById('publicLoginView').classList.add('hidden');
+        document.getElementById('userInfo').classList.remove('hidden');
+        document.getElementById('sidebarNav').classList.remove('hidden');
+        document.getElementById('operationalView').classList.remove('hidden');
+
+        const badge = document.getElementById('userRoleBadge');
+        badge.textContent = state.user.role;
+        badge.className = `badge ${state.user.role === 'PRINCIPAL' ? 'badge-red' : (state.user.role === 'STAFF' ? 'badge-amber' : 'badge-blue')}`;
+        
+        document.getElementById('userNameDisplay').textContent = state.user.name;
+
+        renderSidebar();
+        loadModule(roleRoutes[state.user.role][0]);
+      }
+
+      function renderSidebar() {
+        const nav = document.getElementById('sidebarNav');
+        nav.innerHTML = '';
+        const modules = roleRoutes[state.user.role] || [];
+
+        modules.forEach((mod, idx) => {
+          const btn = document.createElement('button');
+          btn.className = `nav-btn ${idx === 0 ? 'active' : ''}`;
+          btn.textContent = mod;
+          btn.onclick = () => {
+            document.querySelectorAll('sidebar .nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadModule(mod);
+          };
+          nav.appendChild(btn);
+        });
+      }
+
+      function loadModule(moduleName) {
+        document.getElementById('viewTitle').textContent = moduleName;
+        document.getElementById('viewSubtitle').textContent = `Role Context: ${state.user.role} \vert{} Department:${state.user.dept || 'All'}`;
+        const body = document.getElementById('viewBody');
+        const actions = document.getElementById('viewActions');
+        body.innerHTML = '';
+        actions.innerHTML = '';
+
+        // Check Account Restriction Lockdown
+        if (state.restrictedUntil && Date.now() < state.restrictedUntil && (moduleName.includes('Chat') || moduleName.includes('Feedback'))) {
+          body.innerHTML = `<div class="card"><p style="color:var(--danger)">Access Denied: Your account is under dynamic 17-hour administrative restriction.</p></div>`;
+          return;
+        }
+
+        if (moduleName.includes('Timetable')) {
+          renderTimetableModule(body, actions);
+        } else if (moduleName.includes('Map')) {
+          renderMapModule(body);
+        } else if (moduleName.includes('Chat')) {
+          renderChatModule(body);
+        } else if (moduleName.includes('Notices')) {
+          renderNoticesModule(body, actions);
+        } else if (moduleName.includes('Events')) {
+          renderEventsModule(body, actions);
+        } else if (moduleName.includes('Feedback')) {
+          renderFeedbackModule(body);
+        } else if (moduleName.includes('AI Assistant')) {
+          renderAIAssistantModule(body);
+        } else if (moduleName.includes('Student Directory')) {
+          renderStudentDirectoryModule(body, actions);
+        } else {
+          renderDashboardSummary(body);
+        }
+      }
+
+      // --- MODULE RENDERERS ---
+
+      function renderDashboardSummary(container) {
+        container.innerHTML = `
+          <div class="grid-4">
+            <div class="card"><h4 style="color:var(--text-muted); font-size:0.75rem;">DEPARTMENT STATUS</h4><p style="font-size:1.5rem; font-weight:700; margin-top:0.25rem;">6 Active</p></div>
+            <div class="card"><h4 style="color:var(--text-muted); font-size:0.75rem;">PUBLISHED NOTICES</h4><p style="font-size:1.5rem; font-weight:700; margin-top:0.25rem;">${state.notices.length} Items</p></div>
+            <div class="card"><h4 style="color:var(--text-muted); font-size:0.75rem;">UPCOMING EVENTS</h4><p style="font-size:1.5rem; font-weight:700; margin-top:0.25rem;">${state.events.length} Scheduled</p></div>
+            <div class="card"><h4 style="color:var(--text-muted); font-size:0.75rem;">SYSTEM STATUS</h4><p style="font-size:1.5rem; font-weight:700; margin-top:0.25rem; color:var(--accent);">Operational</p></div>
+          </div>
+          <div class="card" style="margin-top:1rem;">
+            <h3>M. A. M. College Of Engineering Overview</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; margin-top:0.5rem;">Trichy - Chennai Trunk Road, Siruganur, Tiruchirappalli - 621 105. AICTE Approved, Affiliated to Anna University Chennai.</p>
+          </div>
+        `;
+      }
+
+      function renderTimetableModule(container, actions) {
+        const canEdit = state.user.role === 'PRINCIPAL';
+        
+        if (canEdit) {
+          actions.innerHTML = `<button class="btn btn-sm" onclick="app.openAddScheduleModal()">+ Create Schedule Entry</button>`;
+        }
+
+        let tabsHtml = depts.map(d => `<div class="tab-item ${d === state.activeDept ? 'active' : ''}" onclick="app.switchDept('${d}')">${d}</div>`).join('');
+        
+        const schedule = state.timetables[state.activeDept] || [];
+
+        let rowsHtml = schedule.map(r => `
+          <tr>
+            <td><strong>${r.day}</strong></td>
+            <td>${r.p1}</td>
+            <td>${r.p2}</td>
+            <td>${r.p3}</td>
+            <td>${r.p4}</td>
+          </tr>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="card">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Department Academic Schedule Grid</h3>
+            <div class="dept-tabs">${tabsHtml}</div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Day</th>
+                    <th>09:00 AM - 10:00 AM</th>
+                    <th>10:00 AM - 11:00 AM</th>
+                    <th>11:15 AM - 12:15 PM</th>
+                    <th>01:15 PM - 02:15 PM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rowsHtml || '<tr><td colspan="5">No schedule records configured for this department.</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderMapModule(container) {
+        container.innerHTML = `
+          <div class="card">
+            <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Verified Campus Geographic Location</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">M. A. M. College Of Engineering, Trichy - Chennai Trunk Road, Siruganur, Tiruchirappalli - 621 105</p>
+            <div id="mapContainer" style="height: 400px; width: 100%; border-radius: var(--radius); border: 1px solid var(--border);"></div>
+          </div>
+        `;
+
+        setTimeout(() => {
+          const lat = 10.99556;
+          const lng = 78.77806;
+          const map = L.map('mapContainer').setView([lat, lng], 15);
+
+          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+
+          L.marker([lat, lng]).addTo(map)
+            .bindPopup(`<strong>M. A. M. College Of Engineering</strong><br>Siruganur, Tiruchirappalli - 621 105`)
+            .openPopup();
+
+          // Nearby locations within 5km radius
+          L.circle([10.99556, 78.77806], { radius: 5000, color: '#3B82F6', fillOpacity: 0.05 }).addTo(map);
+          L.marker([10.992, 78.772]).addTo(map).bindPopup('Sri Angalamman College (0.8 km)');
+          L.marker([10.980, 78.790]).addTo(map).bindPopup('Konalai Lake (2.4 km)');
+        }, 150);
+      }
+
+      function renderChatModule(container) {
+        let msgsHtml = state.messages.map(m => {
+          const isMe = m.sender === 'You';
+          const ageSec = Math.floor((Date.now() - m.time) / 1000);
+          const editAllowed = isMe && ageSec <= 60;
+          return `
+            <div class="msg ${isMe ? 'msg-sent' : 'msg-recv'}">
+              <div style="font-weight:600; font-size:0.75rem; margin-bottom:2px;">${m.sender}</div>
+              <div>${m.text}</div>
+              <div class="msg-meta">
+                <span>${new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>${isMe ? `<span>${editAllowed ? `<a href="#" onclick="app.editMsg(${m.id})" style="color:#60A5FA">Edit (${60 - ageSec}s)</a>` : '<span style="color:var(--text-muted)">Locked</span>'}</span>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = `
+          <div class="card" style="max-width: 650px;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">1-to-1 Ephemeral Communication Channel</h3>
+            <div class="chat-box" id="chatBox">${msgsHtml}</div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+              <input type="text" id="msgInput" placeholder="Type message payload...">
+              <button class="btn" onclick="app.sendMsg()">Send</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderNoticesModule(container, actions) {
+        if (state.user.role === 'PRINCIPAL') {
+          actions.innerHTML = `<button class="btn btn-sm" onclick="app.openCreateNoticeModal()">+ Create Notice</button>`;
+        }
+
+        const filtered = state.notices.filter(n => {
+          if (state.user.role === 'PRINCIPAL') return true;
+          return n.target === 'ALL' || n.target === state.user.dept || n.target === state.user.role;
+        });
+
+        let itemsHtml = filtered.map(n => `
+          <div class="card">
+            <div style="display:flex; justify-space-between; align-items:center;">
+              <h4 style="font-size:1rem; font-weight:700;">${n.title}</h4>
+              <span class="badge badge-blue">Target: ${n.target}</span>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin:0.5rem 0;">${n.content}</p>
+            <small style="color:var(--text-muted)">Published: ${n.date}</small>
+          </div>
+        `).join('');
+
+        container.innerHTML = itemsHtml || `<div class="card"><p>No active notices targeting your account.</p></div>`;
+      }
+
+      function renderEventsModule(container, actions) {
+        if (state.user.role === 'PRINCIPAL') {
+          actions.innerHTML = `<button class="btn btn-sm" onclick="app.openCreateEventModal()">+ Create Event</button>`;
+        }
+
+        let itemsHtml = state.events.map(e => `
+          <div class="card">
+            <h4 style="font-size:1rem; font-weight:700; color:var(--primary);">${e.title}</h4>
+            <p style="font-size:0.875rem; margin:0.5rem 0;">${e.desc}</p>
+            <div style="font-size:0.8rem; color:var(--text-muted); display:flex; gap:1.5rem;">
+              <span>📅 Date: ${e.date}</span>
+              <span>⏰ Time: ${e.time}</span>
+              <span>📍 Venue: ${e.venue}</span>
+            </div>
+          </div>
+        `).join('');
+
+        container.innerHTML = itemsHtml || `<div class="card"><p>No public events scheduled currently.</p></div>`;
+      }
+
+      function renderFeedbackModule(container) {
+        if (state.user.role === 'STUDENT') {
+          container.innerHTML = `
+            <div class="card" style="max-width:550px;">
+              <h3 style="font-size:1rem; margin-bottom:0.75rem;">Submit Confidential Feedback to Principal</h3>
+              <input type="text" id="fbSubject" placeholder="Feedback Subject">
+              <textarea id="fbBody" rows="4" style="margin-top:0.5rem;" placeholder="Detailed feedback message..."></textarea>
+              <button class="btn" style="margin-top:1rem;" onclick="app.submitFeedback()">Submit Feedback</button>
+            </div>
+          `;
+        } else if (state.user.role === 'PRINCIPAL') {
+          let rowsHtml = state.feedbackList.map(f => `
+            <tr>
+              <td>${f.student}</td>
+              <td>${f.subject}</td>
+              <td>${f.body}</td>
+              <td><span class="badge ${f.status === 'Unread' ? 'badge-amber' : 'badge-green'}">${f.status}</span></td>
+              <td><button class="btn btn-sm" onclick="app.markFeedbackRead(${f.id})">Mark Read</button></td>
+            </tr>
+          `).join('');
+
+          container.innerHTML = `
+            <div class="card">
+              <h3 style="font-size:1rem; margin-bottom:0.75rem;">Student Feedback Submissions</h3>
+              <div class="table-container">
+                <table>
+                  <thead><tr><th>Student</th><th>Subject</th><th>Content</th><th>Status</th><th>Action</th></tr></thead>
+                  <tbody>${rowsHtml || '<tr><td colspan="5">No feedback submissions.</td></tr>'}</tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function renderStudentDirectoryModule(container) {
+        let rowsHtml = state.students.map(s => `
+          <tr>
+            <td>${s.roll}</td>
+            <td>${s.name}</td>
+            <td>${s.dept}</td>
+            <td>${s.yearJoined} -${s.yearEnding}</td>
+            <td><span class="badge badge-green">${s.status}</span></td>
+            <td>
+              ${(state.user.role === 'STAFF' || state.user.role === 'PRINCIPAL') ? 
+                `<button class="btn btn-sm btn-danger" onclick="app.restrictStudent('${s.id}')">Apply 17h Restriction</button>` : ''}
+            </td>
+          </tr>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="card">
+            <h3 style="font-size:1rem; margin-bottom:0.75rem;">Student Profile Registry</h3>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Roll Number</th><th>Name</th><th>Department</th><th>Academic Cycle</th><th>Status</th><th>Administrative Actions</th></tr></thead>
+                <tbody>${rowsHtml}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderAIAssistantModule(container) {
+        container.innerHTML = `
+          <div class="card" style="max-width:600px;">
+            <h3 style="font-size:1rem; margin-bottom:0.5rem;">Institutional AI Assistant</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Ask questions regarding timetables, campus maps, notices, or Anna University curriculum regulations.</p>
+            <div class="chat-box" id="aiBox" style="height:250px;">
+              <div class="msg msg-recv">
+                <strong>Assistant</strong>
+                <div>Hello! I am your M. A. M. College Of Engineering Assistant. How can I help you today?</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+              <input type="text" id="aiInput" placeholder="Ask e.g. Where is the campus located?">
+              <button class="btn" onclick="app.askAI()">Ask AI</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // --- USER ACTIONS ---
+
+      function sendMsg() {
+        const input = document.getElementById('msgInput');
+        if (!input.value.trim()) return;
+        state.messages.push({
+          id: Date.now(),
+          sender: 'You',
+          text: input.value.trim(),
+          time: Date.now(),
+          canEdit: true
+        });
+        input.value = '';
+        loadModule('Private Chat');
+      }
+
+      function editMsg(id) {
+        const msg = state.messages.find(m => m.id === id);
+        if (!msg) return;
+        const ageSec = Math.floor((Date.now() - msg.time) / 1000);
+        if (ageSec > 60) {
+          alert("Editing window locked: Server enforces a strict 60-second limit.");
+          return;
+        }
+        const updated = prompt("Edit message payload (within 60s window):", msg.text);
+        if (updated) {
+          msg.text = updated;
+          loadModule('Private Chat');
+        }
+      }
+
+      function submitFeedback() {
+        const subj = document.getElementById('fbSubject')?.value;
+        const body = document.getElementById('fbBody')?.value;
+        if (!subj || !body) return alert("Fill out all feedback fields.");
+        state.feedbackList.push({
+          id: Date.now(),
+          student: state.user.name,
+          subject: subj,
+          body: body,
+          status: 'Unread'
+        });
+        alert("Confidential feedback submitted directly to Principal.");
+        document.getElementById('fbSubject').value = '';
+        document.getElementById('fbBody').value = '';
+      }
+
+      function markFeedbackRead(id) {
+        const item = state.feedbackList.find(f => f.id === id);
+        if (item) item.status = 'Read';
+        loadModule('Feedback Review');
+      }
+
+      function restrictStudent(studentId) {
+        if (confirm("Apply temporary 17-hour restriction to this student account?")) {
+          state.restrictedUntil = Date.now() + (17 * 60 * 60 * 1000);
+          document.getElementById('restrictionBanner').classList.remove('hidden');
+          alert("17-hour administrative restriction enforced successfully.");
+        }
+      }
+
+      function askAI() {
+        const input = document.getElementById('aiInput');
+        const box = document.getElementById('aiBox');
+        if (!input.value.trim()) return;
+
+        const q = input.value.toLowerCase();
+        let reply = "I can assist with schedule details, notices, events, and campus maps for M. A. M. College Of Engineering.";
+
+        if (q.includes('location') || q.includes('where') || q.includes('address')) {
+          reply = "M. A. M. College Of Engineering is located on Trichy - Chennai Trunk Road, Siruganur, Tiruchirappalli - 621 105, Tamil Nadu.";
+        } else if (q.includes('timetable') || q.includes('class')) {
+          reply = `The ${state.activeDept} department timetable is active. Select the Timetable module tab to view periods.`;
+        } else if (q.includes('code') || q.includes('tnea')) {
+          reply = "The TNEA counselling code for M. A. M. College Of Engineering is 3810.";
+        }
+
+        box.innerHTML += `
+          <div class="msg msg-sent"><strong>You</strong><div>${input.value}</div></div>
+          <div class="msg msg-recv"><strong>Assistant</strong><div>${reply}</div></div>
+        `;
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+      }
+
+      function switchDept(d) {
+        state.activeDept = d;
+        loadModule('Timetable');
+      }
+
+      function openAddScheduleModal() {
+        document.getElementById('modalTitle').textContent = 'Add Timetable Period Entry';
+        document.getElementById('modalBody').innerHTML = `
+          <div><label style="font-size:0.75rem; color:var(--text-muted)">DAY</label><select id="schedDay"><option>Monday</option><option>Tuesday</option></select></div>
+          <div><label style="font-size:0.75rem; color:var(--text-muted)">PERIOD 1 SUBJECT</label><input type="text" id="schedP1" placeholder="Subject Name"></div>
+        `;
+        document.getElementById('modalConfirmBtn').onclick = () => {
+          const day = document.getElementById('schedDay').value;
+          const p1 = document.getElementById('schedP1').value || 'Lecture Period';
+          state.timetables[state.activeDept].push({ day: day, p1: p1, p2: 'Elective', p3: 'Lab', p4: 'Seminar' });
+          closeModal();
+          loadModule('All Department Timetables');
+        };
+        document.getElementById('modalOverlay').classList.remove('hidden');
+      }
+
+      function openCreateNoticeModal() {
+        document.getElementById('modalTitle').textContent = 'Publish Institutional Notice';
+        document.getElementById('modalBody').innerHTML = `
+          <div><label style="font-size:0.75rem; color:var(--text-muted)">NOTICE TITLE</label><input type="text" id="notTitle" placeholder="Title"></div>
+          <div><label style="font-size:0.75rem; color:var(--text-muted)">TARGET AUDIENCE</label><select id="notTarget"><option value="ALL">All Students</option><option value="CSE">CSE Department</option><option value="STAFF">Staff Only</option></select></div>
+          <div><label style="font-size:0.75rem; color:var(--text-muted)">CONTENT</label><textarea id="notContent" rows="3"></textarea></div>
+        `;
+        document.getElementById('modalConfirmBtn').onclick = () => {
+          state.notices.push({
+            id: Date.now(),
+            title: document.getElementById('notTitle').value || 'Notice',
+            target: document.getElementById('notTarget').value,
+            dept: 'ALL',
+            date: new Date().toISOString().split('T')[0],
+            content: document.getElementById('notContent').value || 'Notice content payload.'
+          });
+          closeModal();
+          loadModule('Notices Management');
+        };
+        document.getElementById('modalOverlay').classList.remove('hidden');
+      }
+
+      function closeModal() {
+        document.getElementById('modalOverlay').classList.add('hidden');
+      }
+
+      function checkTimers() {
+        if (state.restrictedUntil) {
+          const rem = Math.max(0, state.restrictedUntil - Date.now());
+          if (rem === 0) {
+            state.restrictedUntil = null;
+            document.getElementById('restrictionBanner').classList.add('hidden');
+          } else {
+            const h = Math.floor(rem / 3600000);
+            const m = Math.floor((rem % 3600000) / 60000);
+            const banner = document.getElementById('restrictionTimer');
+            if (banner) banner.textContent = `${h}h${m}m remaining`;
+          }
+        }
+      }
+
+      function logout() {
+        state.user = null;
+        document.getElementById('userInfo').classList.add('hidden');
+        document.getElementById('sidebarNav').classList.add('hidden');
+        document.getElementById('operationalView').classList.add('hidden');
+        document.getElementById('publicLoginView').classList.remove('hidden');
+        setAuthMode('STUDENT');
+      }
+
+      return { init, setAuthMode, switchDept, sendMsg, editMsg, submitFeedback, markFeedbackRead, restrictStudent, askAI, openAddScheduleModal, openCreateNoticeModal, closeModal };
+    })();
+
+    document.addEventListener('DOMContentLoaded', app.init);
+  </script>
+</body>
+</html>
